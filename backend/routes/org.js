@@ -28,6 +28,21 @@ router.get("/id/:id", (req, res, next) => {
     })
 });
 
+//GET events for which a client is signed up
+router.get("/client/:orgid", (req, res, next) => { 
+    eventdata.find( 
+        {org_id: req.params.orgid}, 
+        (error, data) => { 
+            if (error) {
+                return next(error);
+            } else {
+                res.json(data);
+            }
+        }
+    );
+});
+
+
 //POST
 router.post("/", (req, res, next) => { 
     org.create( 
@@ -57,6 +72,15 @@ router.put("/:id", (req, res, next) => {
     );
 });
 
-
+//Delete org by single entry by ID
+router.delete("/id/:id", (req, res, next) => { 
+    org.deleteOne({ _id: req.params.id }, (error, data) => {
+        if (error) {
+            return next(error)
+        } else {
+            res.json(data)
+        }
+    })
+});
 
 module.exports = router;
