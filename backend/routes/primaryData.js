@@ -32,6 +32,34 @@ router.get("/id/:id", (req, res, next) => {
     );
 });
 
+//GET read endpoint to use a query papermeter studentID or for all clients entries
+router.get('/', (req, res, next) => {
+    //checking whether a query parameter is used in the request
+    if (req.query.clientid) {
+        primarydata.findOne({ clientID: req.query.clientid }, (error, data) => {
+            if (error) {
+                return next(error)
+            } else if (data === null) {
+                // Sending 404 when not found something is a good practice
+                res.status(404).send('Client not found');
+            }
+            else {
+                res.json(data)
+            }
+        });
+    } else {
+        //very plain way to get all the data from the collection through the mongoose schema
+        primarydata.find((error, data) => {
+            if (error) {
+                //here we are using a call to next() to send an error message back
+                return next(error)
+            } else {
+                res.json(data)
+            }
+        })
+    }
+});
+
 //GET entries based on search query
 //Ex: '...?firstName=Bob&lastName=&searchBy=name' 
 router.get("/search/", (req, res, next) => { 
@@ -57,7 +85,30 @@ router.get("/search/", (req, res, next) => {
 
 //GET events for a single client
 router.get("/events/:id", (req, res, next) => { 
-    
+    eventdata.find( 
+        {clientID: req.params.clientid }, 
+        (error, data) => { 
+            if (error) {
+                return next(error);
+            } else {
+                res.json(data);
+            }
+        }
+    );
+});
+
+//GET org for a single client
+router.get("/org/:orgid", (req, res, next) => { 
+    primarydata.find( 
+        {org_id: req.params.orgid}, 
+        (error, data) => { 
+            if (error) {
+                return next(error);
+            } else {
+                res.json(data);
+            }
+        }
+    );
 });
 
 //POST
@@ -92,4 +143,15 @@ router.put("/:id", (req, res, next) => {
     );
 });
 
+
+//Delete Guest by single entry by ID
+router.delete("/id/:id", (req, res, next) => { 
+    primarydata.deleteOne({ _id: req.params.id }, (error, data) => {
+        if (error) {
+            return next(error)
+        } else {
+            res.json(data)
+        }
+    })
+});
 module.exports = router;
