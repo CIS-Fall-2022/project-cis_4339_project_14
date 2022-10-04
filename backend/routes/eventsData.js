@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 //importing data model schemas
-let { eventdata } = require("../models/models"); 
-
+let { eventdata } = require("../models/models");  
+let { primarydata } = require("../models/models"); 
 //GET all entries
 router.get("/", (req, res, next) => { 
     eventdata.find( 
@@ -52,9 +52,9 @@ router.get("/search/", (req, res, next) => {
 });
 
 //GET events for which a client is signed up
-router.get("/client/:id", (req, res, next) => { 
+router.get("/client/:clientid", (req, res, next) => { 
     eventdata.find( 
-        { attendees: req.params.id }, 
+        {clientID: req.params.clientid}, 
         (error, data) => { 
             if (error) {
                 return next(error);
@@ -64,6 +64,20 @@ router.get("/client/:id", (req, res, next) => {
         }
     );
 });
+
+router.get("/org/:orgid", (req, res, next) => { 
+    eventdata.find( 
+        {org_id: req.params.orgid}, 
+        (error, data) => { 
+            if (error) {
+                return next(error);
+            } else {
+                res.json(data);
+            }
+        }
+    );
+});
+
 
 //POST
 router.post("/", (req, res, next) => { 
@@ -124,4 +138,15 @@ router.put("/addAttendee/:id", (req, res, next) => {
     
 });
 
+
+//Delete Event by single entry by ID
+router.delete("/id/:id", (req, res, next) => { 
+    eventdata.deleteOne({ _id: req.params.id }, (error, data) => {
+        if (error) {
+            return next(error)
+        } else {
+            res.json(data)
+        }
+    })
+});
 module.exports = router;
