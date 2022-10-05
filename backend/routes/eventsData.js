@@ -52,9 +52,9 @@ router.get("/search/", (req, res, next) => {
 });
 
 //GET events for which a client is signed up
-router.get("/client/:clientid", (req, res, next) => { 
+router.get("/client/:id", (req, res, next) => { 
     eventdata.find( 
-        {clientID: req.params.clientid}, 
+        {attendees: req.params.id},  
         (error, data) => { 
             if (error) {
                 return next(error);
