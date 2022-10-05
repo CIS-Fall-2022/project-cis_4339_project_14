@@ -21,7 +21,7 @@ router.get("/", (req, res, next) => {
     ).sort({ 'updatedAt': -1 }).limit(10);
 });
 
-//GET single entry by ID
+/* //GET single entry by ID
 router.get("/id/:id", (req, res, next) => {
     primarydata.find( 
         { _id: req.params.id }, 
@@ -33,7 +33,7 @@ router.get("/id/:id", (req, res, next) => {
             }
         }
     );
-});
+}); */
 
 //GET read endpoint to use a query papermeter studentID or for all clients entries
 router.get('/', (req, res, next) => {
@@ -66,13 +66,32 @@ router.get('/', (req, res, next) => {
 //GET entries based on search query
 //Ex: '...?firstName=Bob&lastName=&searchBy=name' 
 // Eduardo: Note that this should return ALL orgs since there's not a filter by that
+// Eduardo: This search query can be consolidated.
+// Eduardo: Let's consolidate event and org search into this
 router.get("/search/", (req, res, next) => { 
     let dbQuery = "";
-    if (req.query["searchBy"] === 'name') {
-        dbQuery = { firstName: { $regex: `^${req.query["firstName"]}`, $options: "i" }, lastName: { $regex: `^${req.query["lastName"]}`, $options: "i" } }
-    } else if (req.query["searchBy"] === 'number') {
+    if 
+    (req.query["searchBy"] === 'name') {
+        dbQuery = { 
+            firstName: { $regex: `^${req.query["firstName"]}`, $options: "i" }, 
+            lastName: { $regex: `^${req.query["lastName"]}`, $options: "i" },
+            org_id: req.query.org_id
+        }
+    } else if 
+    (req.query["searchBy"] === 'number') {
         dbQuery = {
-            "phoneNumbers.primaryPhone": { $regex: `^${req.query["phoneNumbers.primaryPhone"]}`, $options: "i" }
+            "phoneNumbers.primaryPhone": { $regex: `^${req.query["phoneNumbers.primaryPhone"]}`, $options: "i" },
+            org_id: req.query.org_id
+        }
+    } else if 
+    (req.query["searchBy"] === 'org') {
+        dbQuery = {
+            org_id: req.query.org_id
+        }
+    } else if 
+    (req.query["searchBy"] === 'id') {
+        dbQuery = {
+            _id: req.query.id
         }
     };
     primarydata.find( 
@@ -152,7 +171,7 @@ router.put("/:id", (req, res, next) => {
 // Eduardo : maybe make the deletion a little more informative
 // So, let's not use ID as the path
 // instead, let's do a route to delete with the URI being /delete
-router.delete("/delete/:id", (req, res, next) => { 
+/* router.delete("/delete/:id", (req, res, next) => { 
     primarydata.deleteOne({ _id: req.params.id }, (error, data) => {
         if (error) {
             return next(error)
@@ -160,7 +179,7 @@ router.delete("/delete/:id", (req, res, next) => {
             res.json(data)
         }
     })
-});
+}); */
 
 // Delete guest by using their phone number (this is only for debugging purposes)
 // aka to make deletion faster
@@ -172,7 +191,27 @@ router.delete("/delete/:id", (req, res, next) => {
 // We should probably add a parameter like org since maybe a user can exist
 // Between multiple orgs
 router.delete("/delete/", (req, res, next) => { 
-    let dbQuery = {"phoneNumbers.primaryPhone": { $regex: `^${req.query["phoneNumbers.primaryPhone"]}`, $options: "i" }}
+    let dbQuery = "";
+    if 
+    (req.query["searchBy"] === 'name') {
+        dbQuery = { 
+            firstName: { $regex: `^${req.query["firstName"]}`, $options: "i" }, 
+            lastName: { $regex: `^${req.query["lastName"]}`, $options: "i" },
+            org_id: req.query.org_id
+        }
+    } else if 
+    (req.query["searchBy"] === 'number') {
+        dbQuery = {
+            "phoneNumbers.primaryPhone": { $regex: `^${req.query["phoneNumbers.primaryPhone"]}`, $options: "i" },
+            org_id: req.query.org_id
+        }
+    } else if
+    (req.query["searchBy"] === 'id') {
+        dbQuery = {
+            _id: req.query.id,
+            org_id: req.query.org_id
+        }
+    };
     primarydata.findOneAndDelete(
         dbQuery,
         (error, data) => {
