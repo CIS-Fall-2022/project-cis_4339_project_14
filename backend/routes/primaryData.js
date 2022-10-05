@@ -5,8 +5,8 @@ const router = express.Router();
 // Eduardo: Honestly we should not be exposing GET / 
 // to return all data
 // We should add 
-let { primarydata } = require("../models/primarydata"); 
-let { eventdata } = require("../models/eventdata"); 
+let { eventdata } = require("../models/models");  
+let { primarydata } = require("../models/models"); 
 
 //GET all entries
 router.get("/", (req, res, next) => { 
