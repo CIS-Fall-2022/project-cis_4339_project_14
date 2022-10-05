@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router(); 
 
 //importing data model schemas
+// Eduardo: Honestly we should not be exposing GET / 
+// to return all data
+// We should add 
 let { primarydata } = require("../models/models"); 
 let { eventdata } = require("../models/models"); 
 
@@ -144,8 +147,11 @@ router.put("/:id", (req, res, next) => {
 });
 
 
-//Delete Guest by single entry by ID
-router.delete("/id/:id", (req, res, next) => { 
+// Delete Guest by single entry by ID
+// Eduardo : maybe make the deletion a little more informative
+// So, let's not use ID as the path
+// instead, let's do a route to delete with the URI being /delete
+router.delete("/delete/:id", (req, res, next) => { 
     primarydata.deleteOne({ _id: req.params.id }, (error, data) => {
         if (error) {
             return next(error)
@@ -154,4 +160,28 @@ router.delete("/id/:id", (req, res, next) => {
         }
     })
 });
+
+// Delete guest by using their phone number (this is only for debugging purposes)
+// aka to make deletion faster
+// Eduardo: As I did with the delete on the last route
+// We can delete here by the phone number provided on the parameters
+// However, note that you cannot differentiate between MORE or OTHER customers 
+// With the same phone number
+// Unless you add more parameters
+// We should probably add a parameter like org since maybe a user can exist
+// Between multiple orgs
+router.delete("/delete/", (req, res, next) => { 
+    let dbQuery = {"phoneNumbers.primaryPhone": { $regex: `^${req.query["phoneNumbers.primaryPhone"]}`, $options: "i" }}
+    primarydata.findOneAndDelete(
+        dbQuery,
+        (error, data) => {
+            if (error) {
+                return next(error);
+            } else {
+                res.json(data);
+            }
+        }
+    )
+});
+
 module.exports = router;
