@@ -92,12 +92,8 @@ let eventDataSchema = new Schema({
     description: {
         type: String,
     },
-    attendees: [
-        {
-            clientID:{
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "primaryData"
-        }
+    attendees: [{
+        type: String,
     }]
 }, {
     collection: 'eventData'
