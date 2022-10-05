@@ -5,8 +5,8 @@ const router = express.Router();
 // Eduardo: Honestly we should not be exposing GET / 
 // to return all data
 // We should add 
-let { primarydata } = require("../models/models"); 
-let { eventdata } = require("../models/models"); 
+let { primarydata } = require("../models/primarydata"); 
+let { eventdata } = require("../models/eventdata"); 
 
 //GET all entries
 router.get("/", (req, res, next) => { 
@@ -65,6 +65,7 @@ router.get('/', (req, res, next) => {
 
 //GET entries based on search query
 //Ex: '...?firstName=Bob&lastName=&searchBy=name' 
+// Eduardo: Note that this should return ALL orgs since there's not a filter by that
 router.get("/search/", (req, res, next) => { 
     let dbQuery = "";
     if (req.query["searchBy"] === 'name') {
