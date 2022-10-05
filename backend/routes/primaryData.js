@@ -90,7 +90,7 @@ router.get("/search/", (req, res, next) => {
 //GET events for a single client
 router.get("/events/:id", (req, res, next) => { 
     eventdata.find( 
-        {clientID: req.params.clientid }, 
+        {attendees: req.params.id},  
         (error, data) => { 
             if (error) {
                 return next(error);
