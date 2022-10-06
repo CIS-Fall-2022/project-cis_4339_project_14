@@ -106,21 +106,9 @@ router.get("/search/", (req, res, next) => {
     );
 });
 
-//GET events for a single client
-router.get("/events/:id", (req, res, next) => { 
-    eventdata.find( 
-        {attendees: req.params.id},  
-        (error, data) => { 
-            if (error) {
-                return next(error);
-            } else {
-                res.json(data);
-            }
-        }
-    );
-});
 
-//GET org for a single client
+
+/* //GET org for a single client
 router.get("/org/:orgid", (req, res, next) => { 
     primarydata.find( 
         {org_id: req.params.orgid}, 
@@ -132,7 +120,7 @@ router.get("/org/:orgid", (req, res, next) => {
             }
         }
     );
-});
+}); */
 
 //POST
 router.post("/", (req, res, next) => { 
@@ -152,9 +140,9 @@ router.post("/", (req, res, next) => {
 });
 
 //PUT update (make sure req body doesn't have the id)
-router.put("/:id", (req, res, next) => { 
+router.put("/update/", (req, res, next) => { 
     primarydata.findOneAndUpdate( 
-        { _id: req.params.id }, 
+        { _id: req.query.id }, 
         req.body,
         (error, data) => {
             if (error) {
