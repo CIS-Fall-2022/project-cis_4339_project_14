@@ -181,7 +181,7 @@ router.delete("/delete/", (req, res, next) => {
         }
     };
     primarydata.findOneAndDelete(
-        dbQuery,
+        {dbQuery},
         (error, data) => {
             if (error) {
                 return next(error);
