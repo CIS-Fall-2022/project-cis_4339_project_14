@@ -82,7 +82,7 @@ router.get("/search/", (req, res, next) => {
         }
     };
     primarydata.find( 
-        {dbQuery}, 
+        dbQuery, 
         (error, data) => { 
             if (error) {
                 return next(error);
@@ -137,7 +137,7 @@ router.put("/update/", (req, res, next) => {
         }
     };
     primarydata.findOneAndUpdate( 
-        {dbQuery}, 
+        dbQuery, 
         req.body,
         (error, data) => {
             if (error) {
@@ -181,7 +181,7 @@ router.delete("/delete/", (req, res, next) => {
         }
     };
     primarydata.findOneAndDelete(
-        {dbQuery},
+        dbQuery,
         (error, data) => {
             if (error) {
                 return next(error);
