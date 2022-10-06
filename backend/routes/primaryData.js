@@ -21,19 +21,6 @@ router.get("/", (req, res, next) => {
     ).sort({ 'updatedAt': -1 }).limit(10);
 });
 
-/* //GET single entry by ID
-router.get("/id/:id", (req, res, next) => {
-    primarydata.find( 
-        { _id: req.params.id }, 
-        (error, data) => {
-            if (error) {
-                return next(error);
-            } else {
-                res.json(data);
-            }
-        }
-    );
-}); */
 
 //GET read endpoint to use a query papermeter studentID or for all clients entries
 router.get('/', (req, res, next) => {
@@ -107,21 +94,6 @@ router.get("/search/", (req, res, next) => {
 });
 
 
-
-/* //GET org for a single client
-router.get("/org/:orgid", (req, res, next) => { 
-    primarydata.find( 
-        {org_id: req.params.orgid}, 
-        (error, data) => { 
-            if (error) {
-                return next(error);
-            } else {
-                res.json(data);
-            }
-        }
-    );
-}); */
-
 //POST
 router.post("/", (req, res, next) => { 
     primarydata.create( 
@@ -140,9 +112,32 @@ router.post("/", (req, res, next) => {
 });
 
 //PUT update (make sure req body doesn't have the id)
-router.put("/update/", (req, res, next) => { 
+// Eduardo: Add some more functionality to the PUT endpoint by
+// Adding ways to update using their phone number, name, or even global id
+// MUST use org parameter or you'll update across multiple orgs.
+router.put("/update/", (req, res, next) => {
+    let dbQuery = ""; 
+    if 
+    (req.query["updateBy"] === 'name') {
+        dbQuery = { 
+            firstName: { $regex: `^${req.query["firstName"]}`, $options: "i" }, 
+            lastName: { $regex: `^${req.query["lastName"]}`, $options: "i" },
+            org_id: req.query.org_id
+        }
+    } else if 
+    (req.query["updateBy"] === 'number') {
+        dbQuery = {
+            "phoneNumbers.primaryPhone": { $regex: `^${req.query["phoneNumbers.primaryPhone"]}`, $options: "i" },
+            org_id: req.query.org_id
+        }
+    } else if
+    (req.query["updateBy"] === 'id') {
+        dbQuery = {
+            _id: req.query.id
+        }
+    };
     primarydata.findOneAndUpdate( 
-        { _id: req.query.id }, 
+        dbQuery, 
         req.body,
         (error, data) => {
             if (error) {
@@ -154,20 +149,6 @@ router.put("/update/", (req, res, next) => {
     );
 });
 
-
-// Delete Guest by single entry by ID
-// Eduardo : maybe make the deletion a little more informative
-// So, let's not use ID as the path
-// instead, let's do a route to delete with the URI being /delete
-/* router.delete("/delete/:id", (req, res, next) => { 
-    primarydata.deleteOne({ _id: req.params.id }, (error, data) => {
-        if (error) {
-            return next(error)
-        } else {
-            res.json(data)
-        }
-    })
-}); */
 
 // Delete guest by using their phone number (this is only for debugging purposes)
 // aka to make deletion faster
