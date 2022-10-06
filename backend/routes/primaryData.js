@@ -137,7 +137,7 @@ router.put("/update/", (req, res, next) => {
         }
     };
     primarydata.findOneAndUpdate( 
-        dbQuery, 
+        {dbQuery}, 
         req.body,
         (error, data) => {
             if (error) {
@@ -178,7 +178,6 @@ router.delete("/delete/", (req, res, next) => {
     (req.query["searchBy"] === 'id') {
         dbQuery = {
             _id: req.query.id,
-            org_id: req.query.org_id
         }
     };
     primarydata.findOneAndDelete(
