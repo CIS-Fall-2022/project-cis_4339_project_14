@@ -53,7 +53,7 @@ router.get("/search/", (req, res, next) => {
         }
     };
     eventdata.find( 
-        {dbQuery}, 
+        dbQuery, 
         (error, data) => { 
             if (error) {
                 return next(error);
@@ -101,7 +101,7 @@ router.put("/update/", (req, res, next) => {
         }
     };
     eventdata.findOneAndUpdate( 
-        {dbQuery}, 
+        dbQuery, 
         req.body,
         (error, data) => {
             if (error) {
@@ -189,7 +189,7 @@ router.delete("/delete/", (req, res, next) => {
         }
     };
     eventdata.findOneAndDelete(
-        {dbQuery},
+        dbQuery,
         (error, data) => {
             if (error) {
                 return next(error);
