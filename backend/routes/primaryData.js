@@ -82,7 +82,7 @@ router.get("/search/", (req, res, next) => {
         }
     };
     primarydata.find( 
-        dbQuery, 
+        {dbQuery}, 
         (error, data) => { 
             if (error) {
                 return next(error);
