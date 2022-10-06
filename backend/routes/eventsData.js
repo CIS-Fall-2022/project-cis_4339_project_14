@@ -1,4 +1,5 @@
 const express = require("express");
+const ObjectID = require("mongoose");
 const router = express.Router();
 
 //importing data model schemas
@@ -18,16 +19,6 @@ router.get("/", (req, res, next) => {
     ).sort({ 'updatedAt': -1 }).limit(10);
 });
 
-/* //GET single entry by ID
-router.get("/id/:id", (req, res, next) => { 
-    eventdata.find({ _id: req.params.id }, (error, data) => {
-        if (error) {
-            return next(error)
-        } else {
-            res.json(data)
-        }
-    })
-}); */
 
 //GET entries based on search query
 //Ex: '...?eventName=Food&searchBy=name' 
@@ -36,25 +27,27 @@ router.get("/search/", (req, res, next) => {
     if 
     (req.query["searchBy"] === 'name') {
         dbQuery = { 
-            eventName: { $regex: `^${req.query["eventName"]}`, $options: "i" } 
+            eventName: { $regex: `^${req.query["eventName"]}`, $options: "i" },
+            org_id: req.query.org_id
         }
     } else if 
     (req.query["searchBy"] === 'date') {
         dbQuery = {
-            date:  req.query["eventDate"]
+            date:  req.query["eventDate"],
+            org_id: req.query.org_id
         }
     } else if 
-    (req.query["searchBy" === 'client']) {
-            dbQuery = {
-                attendees: req.query.id
+    (req.query["searchBy"] === 'client') {
+        dbQuery = {
+            attendees: req.query.id
             }
     } else if
-    (req.query["searchBy" === 'org']) {
+    (req.query["searchBy"] === 'org') {
         dbQuery = {
             org_id: req.query.org_id
         }
     }else if 
-    (req.query["searchBy" === 'id']) {
+    (req.query["searchBy"] === 'id') {
         dbQuery = {
             _id: req.query.id
         }
@@ -71,34 +64,6 @@ router.get("/search/", (req, res, next) => {
     );
 });
 
-//GET events for which a client is signed up
-// Eduardo: This can be consolidated into the search function
-/* router.get("/client/:id", (req, res, next) => { 
-    eventdata.find( 
-        {attendees: req.params.id},  
-        (error, data) => { 
-            if (error) {
-                return next(error);
-            } else {
-                res.json(data);
-            }
-        }
-    );
-});
-
-router.get("/org/:orgid", (req, res, next) => { 
-    eventdata.find( 
-        {org_id: req.params.orgid}, 
-        (error, data) => { 
-            if (error) {
-                return next(error);
-            } else {
-                res.json(data);
-            }
-        }
-    );
-}); */
-
 
 //POST
 router.post("/", (req, res, next) => { 
@@ -114,43 +79,29 @@ router.post("/", (req, res, next) => {
     );
 });
 
-/* //PUT
-router.put("/:id", (req, res, next) => {
-    eventdata.findOneAndUpdate(
-        { _id: req.params.id },
-        req.body,
-        (error, data) => {
-            if (error) {
-                return next(error);
-            } else {
-                res.json(data);
-            }
-        }
-    );
-}); */
 
 router.put("/update/", (req, res, next) => {
     let dbQuery = "";
     if 
-    (req.query["searchBy"] === 'name') {
+    (req.query["updateBy"] === 'name') {
         dbQuery = { 
             eventName: { $regex: `^${req.query["eventName"]}`, $options: "i" },
             org_id: req.query.org_id
         }
     } else if 
-    (req.query["searchBy"] === 'date') {
+    (req.query["updateBy"] === 'date') {
         dbQuery = {
             eventDate: { $regex: `^${req.query["eventDate"]}`, $options: "i" },
             org_id: req.query.org_id
         }
     } else if
-    (req.query["searchBy"] === 'id') {
+    (req.query["updateBy"] === 'id') {
         dbQuery = {
             _id: req.query.id,
         }
     };
     eventdata.findOneAndUpdate( 
-        {dbQuery}, 
+        dbQuery, 
         req.body,
         (error, data) => {
             if (error) {
@@ -163,17 +114,24 @@ router.put("/update/", (req, res, next) => {
 });
 
 //PUT add attendee to event
-router.put("/addAttendee/:id", (req, res, next) => {
+// This has to go into a separate function unfortunately
+// As much as I want to reach callback hell and chain
+// a bunch of stuff to create a command query system
+// There's no need for it
+router.put("/updateAttendees/", (req, res, next) => {
     //only add attendee if not yet signed uo
     eventdata.find( 
-        { _id: req.params.id, attendees: req.body.attendee }, 
+        { 
+        _id: req.query.id, 
+        attendees: req.body.attendee 
+        }, 
         (error, data) => { 
             if (error) {
                 return next(error);
             } else {
                 if (data.length == 0) {
                     eventdata.updateOne(
-                        { _id: req.params.id }, 
+                        { _id: req.query.id }, 
                         { $push: { attendees: req.body.attendee } },
                         (error, data) => {
                             if (error) {
@@ -194,7 +152,7 @@ router.put("/addAttendee/:id", (req, res, next) => {
     
 });
 
-//GET events for a single client
+/* //GET events for a single client
 router.get("/events/:id", (req, res, next) => { 
     eventdata.find( 
         {attendees: req.params.id},  
@@ -206,7 +164,7 @@ router.get("/events/:id", (req, res, next) => {
             }
         }
     );
-});
+}); */
 
 // eventdata DELETE route
 // yes I have no shame and I will reuse code
