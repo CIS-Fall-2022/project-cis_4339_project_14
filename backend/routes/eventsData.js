@@ -166,6 +166,32 @@ router.get("/events/:id", (req, res, next) => {
     );
 }); */
 
+// Counts total number of event attendees for each event
+router.get("/eventAttendees", (req, res, next) => {
+    var checkDate = new Date()
+
+    eventdata.aggregate([
+        {
+            $match: {
+                date: {
+                    $gt: new Date(checkDate.setMonth(checkDate.getMonth() - 2)),
+                    $lt: new Date()
+                }
+            }
+        },
+        { $group: { _id: "$eventName", total: { $sum: { $size: "$attendees" } } } }
+    ],
+        (error, data) => {
+            if (error) {
+                return next(error);
+            } else {
+                res.json(data);
+            }
+        }
+    )
+});
+
+
 // eventdata DELETE route
 // yes I have no shame and I will reuse code
 router.delete("/delete/", (req, res, next) => { 
