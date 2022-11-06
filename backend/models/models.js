@@ -5,13 +5,8 @@ const Schema = mongoose.Schema;
 //collection for intakeData
 let primaryDataSchema = new Schema({
     // This is a reference to the organization collection
-    clientID: {
-        type: Number,
-        required: true,
-        unique: true
-    },
     org_id: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Types.ObjectId,
         ref: 'org'
     },
     firstName: {
@@ -104,7 +99,7 @@ let eventDataSchema = new Schema({
 let orgSchema = new Schema({
     org_id: { 
         type: Number, 
-        required: true
+        required: true,
     },
     orgName: {
         type: String,
