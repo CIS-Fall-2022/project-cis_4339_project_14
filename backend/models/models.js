@@ -99,7 +99,7 @@ let eventDataSchema = new Schema({
 let orgSchema = new Schema({
     org_id: { 
         type: Number, 
-        required: true,
+        required: true
     },
     orgName: {
         type: String,
