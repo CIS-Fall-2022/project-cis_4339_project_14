@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon app.js",
     "start:o1": "set NODE_ENV=org1&& node app.js",
-    "start:o2": "set NODE_ENV=org2&& node app.js"
+    "start:o2": "set NODE_ENV=org2&& node app.js",
     "start:o3": "set NODE_ENV=org3&& node app.js"
   },
   "dependencies": {
