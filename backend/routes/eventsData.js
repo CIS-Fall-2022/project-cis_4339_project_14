@@ -1,14 +1,12 @@
 const express = require("express");
-const ObjectID = require("mongoose");
 const router = express.Router();
 
 //importing data model schemas
-let { eventdata } = require("../models/models");  
-let { primarydata } = require("../models/models"); 
-
+let { eventdata } = require("../models/models");
+let { primarydata } = require("../models/models");
 //GET all entries
-router.get("/", (req, res, next) => { 
-    eventdata.find( 
+router.get("/", (req, res, next) => {
+    eventdata.find(
         (error, data) => {
             if (error) {
                 return next(error);
@@ -19,42 +17,58 @@ router.get("/", (req, res, next) => {
     ).sort({ 'updatedAt': -1 }).limit(10);
 });
 
+//GET single entry by ID
+router.get("/id/:id", (req, res, next) => {
+    eventdata.find({ _id: req.params.id }, (error, data) => {
+        if (error) {
+            return next(error)
+        } else {
+            res.json(data)
+        }
+    })
+});
 
 //GET entries based on search query
 //Ex: '...?eventName=Food&searchBy=name' 
-router.get("/search/", (req, res, next) => { 
+router.get("/search/", (req, res, next) => {
     let dbQuery = "";
-    if 
-    (req.query["searchBy"] === 'name') {
-        dbQuery = { 
-            eventName: { $regex: `^${req.query["eventName"]}`, $options: "i" },
-            org_id: req.query.org_id
-        }
-    } else if 
-    (req.query["searchBy"] === 'date') {
+    if (req.query["searchBy"] === 'name') {
+        dbQuery = { eventName: { $regex: `^${req.query["eventName"]}`, $options: "i" } }
+    } else if (req.query["searchBy"] === 'date') {
         dbQuery = {
-            date:  req.query["eventDate"],
-            org_id: req.query.org_id
-        }
-    } else if 
-    (req.query["searchBy"] === 'client') {
-        dbQuery = {
-            attendees: req.query.id
-            }
-    } else if
-    (req.query["searchBy"] === 'org') {
-        dbQuery = {
-            org_id: req.query.org_id
-        }
-    }else if 
-    (req.query["searchBy"] === 'id') {
-        dbQuery = {
-            _id: req.query.id
+            date: req.query["eventDate"]
         }
     };
-    eventdata.find( 
-        dbQuery, 
-        (error, data) => { 
+    eventdata.find(
+        dbQuery,
+        (error, data) => {
+            if (error) {
+                return next(error);
+            } else {
+                res.json(data);
+            }
+        }
+    );
+});
+
+//GET events for which a client is signed up
+router.get("/client/:id", (req, res, next) => {
+    eventdata.find(
+        { attendees: req.params.id },
+        (error, data) => {
+            if (error) {
+                return next(error);
+            } else {
+                res.json(data);
+            }
+        }
+    );
+});
+
+router.get("/org/:orgid", (req, res, next) => {
+    eventdata.find(
+        { org_id: req.params.orgid },
+        (error, data) => {
             if (error) {
                 return next(error);
             } else {
@@ -66,10 +80,10 @@ router.get("/search/", (req, res, next) => {
 
 
 //POST
-router.post("/", (req, res, next) => { 
-    eventdata.create( 
-        req.body, 
-        (error, data) => { 
+router.post("/", (req, res, next) => {
+    eventdata.create(
+        req.body,
+        (error, data) => {
             if (error) {
                 return next(error);
             } else {
@@ -79,29 +93,10 @@ router.post("/", (req, res, next) => {
     );
 });
 
-
-router.put("/update/", (req, res, next) => {
-    let dbQuery = "";
-    if 
-    (req.query["updateBy"] === 'name') {
-        dbQuery = { 
-            eventName: { $regex: `^${req.query["eventName"]}`, $options: "i" },
-            org_id: req.query.org_id
-        }
-    } else if 
-    (req.query["updateBy"] === 'date') {
-        dbQuery = {
-            eventDate: { $regex: `^${req.query["eventDate"]}`, $options: "i" },
-            org_id: req.query.org_id
-        }
-    } else if
-    (req.query["updateBy"] === 'id') {
-        dbQuery = {
-            _id: req.query.id,
-        }
-    };
-    eventdata.findOneAndUpdate( 
-        dbQuery, 
+//PUT
+router.put("/:id", (req, res, next) => {
+    eventdata.findOneAndUpdate(
+        { _id: req.params.id },
         req.body,
         (error, data) => {
             if (error) {
@@ -114,29 +109,20 @@ router.put("/update/", (req, res, next) => {
 });
 
 //PUT add attendee to event
-// This has to go into a separate function unfortunately
-// As much as I want to reach callback hell and chain
-// a bunch of stuff to create a command query system
-// There's no need for it
-router.put("/updateAttendees/", (req, res, next) => {
+router.put("/addAttendee/:id", (req, res, next) => {
     //only add attendee if not yet signed uo
-    eventdata.find( 
-        { 
-        _id: req.query.id, 
-        attendees: req.body.attendee 
-        }, 
-        (error, data) => { 
+    eventdata.find(
+        { _id: req.params.id, attendees: req.body.attendee },
+        (error, data) => {
             if (error) {
                 return next(error);
             } else {
                 if (data.length == 0) {
                     eventdata.updateOne(
-                        { _id: req.query.id }, 
+                        { _id: req.params.id },
                         { $push: { attendees: req.body.attendee } },
                         (error, data) => {
                             if (error) {
-                                // Eduardo: ??
-                                // just. consol
                                 consol
                                 return next(error);
                             } else {
@@ -145,26 +131,12 @@ router.put("/updateAttendees/", (req, res, next) => {
                         }
                     );
                 }
-                
-            }
-        }
-    );
-    
-});
 
-/* //GET events for a single client
-router.get("/events/:id", (req, res, next) => { 
-    eventdata.find( 
-        {attendees: req.params.id},  
-        (error, data) => { 
-            if (error) {
-                return next(error);
-            } else {
-                res.json(data);
             }
         }
     );
-}); */
+
+});
 
 // Counts total number of event attendees for each event
 router.get("/eventAttendees", (req, res, next) => {
@@ -192,37 +164,14 @@ router.get("/eventAttendees", (req, res, next) => {
 });
 
 
-// eventdata DELETE route
-// yes I have no shame and I will reuse code
-router.delete("/delete/", (req, res, next) => { 
-    let dbQuery = "";
-    if 
-    (req.query["searchBy"] === 'name') {
-        dbQuery = { 
-            eventName: { $regex: `^${req.query["eventName"]}`, $options: "i" },
-            org_id: req.query.org_id
+//Delete Event by single entry by ID
+router.delete("/id/:id", (req, res, next) => {
+    eventdata.deleteOne({ _id: req.params.id }, (error, data) => {
+        if (error) {
+            return next(error)
+        } else {
+            res.json(data)
         }
-    } else if 
-    (req.query["searchBy"] === 'date') {
-        dbQuery = {
-            eventDate: { $regex: `^${req.query["eventDate"]}`, $options: "i" },
-            org_id: req.query.org_id
-        }
-    } else if
-    (req.query["searchBy"] === 'id') {
-        dbQuery = {
-            _id: req.query.id,
-        }
-    };
-    eventdata.findOneAndDelete(
-        dbQuery,
-        (error, data) => {
-            if (error) {
-                return next(error);
-            } else {
-                res.json(data);
-            }
-        }
-    )
+    })
 });
 module.exports = router;
