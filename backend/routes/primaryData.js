@@ -2,11 +2,8 @@ const express = require("express");
 const router = express.Router(); 
 
 //importing data model schemas
-// Eduardo: Honestly we should not be exposing GET / 
-// to return all data
-// We should add 
-let { eventdata } = require("../models/models");  
 let { primarydata } = require("../models/models"); 
+let { eventdata } = require("../models/models"); 
 
 //GET all entries
 router.get("/", (req, res, next) => { 
@@ -21,6 +18,19 @@ router.get("/", (req, res, next) => {
     ).sort({ 'updatedAt': -1 }).limit(10);
 });
 
+//GET single entry by ID
+router.get("/id/:id", (req, res, next) => {
+    primarydata.find( 
+        { _id: req.params.id }, 
+        (error, data) => {
+            if (error) {
+                return next(error);
+            } else {
+                res.json(data);
+            }
+        }
+    );
+});
 
 //GET read endpoint to use a query papermeter studentID or for all clients entries
 router.get('/', (req, res, next) => {
@@ -52,33 +62,13 @@ router.get('/', (req, res, next) => {
 
 //GET entries based on search query
 //Ex: '...?firstName=Bob&lastName=&searchBy=name' 
-// Eduardo: Note that this should return ALL orgs since there's not a filter by that
-// Eduardo: This search query can be consolidated.
-// Eduardo: Let's consolidate event and org search into this
 router.get("/search/", (req, res, next) => { 
     let dbQuery = "";
-    if 
-    (req.query["searchBy"] === 'name') {
-        dbQuery = { 
-            firstName: { $regex: `^${req.query["firstName"]}`, $options: "i" }, 
-            lastName: { $regex: `^${req.query["lastName"]}`, $options: "i" },
-            org_id: req.query.org_id
-        }
-    } else if 
-    (req.query["searchBy"] === 'number') {
+    if (req.query["searchBy"] === 'name') {
+        dbQuery = { firstName: { $regex: `^${req.query["firstName"]}`, $options: "i" }, lastName: { $regex: `^${req.query["lastName"]}`, $options: "i" } }
+    } else if (req.query["searchBy"] === 'number') {
         dbQuery = {
-            "phoneNumbers.primaryPhone": { $regex: `^${req.query["phoneNumbers.primaryPhone"]}`, $options: "i" },
-            org_id: req.query.org_id
-        }
-    } else if 
-    (req.query["searchBy"] === 'org') {
-        dbQuery = {
-            org_id: req.query.org_id
-        }
-    } else if 
-    (req.query["searchBy"] === 'id') {
-        dbQuery = {
-            _id: req.query.id
+            "phoneNumbers.primaryPhone": { $regex: `^${req.query["phoneNumbers.primaryPhone"]}`, $options: "i" }
         }
     };
     primarydata.find( 
@@ -93,6 +83,33 @@ router.get("/search/", (req, res, next) => {
     );
 });
 
+//GET events for a single client
+router.get("/events/:id", (req, res, next) => { 
+    eventdata.find( 
+        {attendees: req.params.id}, 
+        (error, data) => { 
+            if (error) {
+                return next(error);
+            } else {
+                res.json(data);
+            }
+        }
+    );
+});
+
+//GET org for a single client
+router.get("/org/:orgid", (req, res, next) => { 
+    primarydata.find( 
+        {org_id: req.params.orgid}, 
+        (error, data) => { 
+            if (error) {
+                return next(error);
+            } else {
+                res.json(data);
+            }
+        }
+    );
+});
 
 //POST
 router.post("/", (req, res, next) => { 
@@ -112,32 +129,9 @@ router.post("/", (req, res, next) => {
 });
 
 //PUT update (make sure req body doesn't have the id)
-// Eduardo: Add some more functionality to the PUT endpoint by
-// Adding ways to update using their phone number, name, or even global id
-// MUST use org parameter or you'll update across multiple orgs.
-router.put("/update/", (req, res, next) => {
-    let dbQuery = ""; 
-    if 
-    (req.query["updateBy"] === 'name') {
-        dbQuery = { 
-            firstName: { $regex: `^${req.query["firstName"]}`, $options: "i" }, 
-            lastName: { $regex: `^${req.query["lastName"]}`, $options: "i" },
-            org_id: req.query.org_id
-        }
-    } else if 
-    (req.query["updateBy"] === 'number') {
-        dbQuery = {
-            "phoneNumbers.primaryPhone": { $regex: `^${req.query["phoneNumbers.primaryPhone"]}`, $options: "i" },
-            org_id: req.query.org_id
-        }
-    } else if
-    (req.query["updateBy"] === 'id') {
-        dbQuery = {
-            _id: req.query.id
-        }
-    };
+router.put("/:id", (req, res, next) => { 
     primarydata.findOneAndUpdate( 
-        dbQuery, 
+        { _id: req.params.id }, 
         req.body,
         (error, data) => {
             if (error) {
@@ -150,46 +144,14 @@ router.put("/update/", (req, res, next) => {
 });
 
 
-// Delete guest by using their phone number (this is only for debugging purposes)
-// aka to make deletion faster
-// Eduardo: As I did with the delete on the last route
-// We can delete here by the phone number provided on the parameters
-// However, note that you cannot differentiate between MORE or OTHER customers 
-// With the same phone number
-// Unless you add more parameters
-// We should probably add a parameter like org since maybe a user can exist
-// Between multiple orgs
-router.delete("/delete/", (req, res, next) => { 
-    let dbQuery = "";
-    if 
-    (req.query["searchBy"] === 'name') {
-        dbQuery = { 
-            firstName: { $regex: `^${req.query["firstName"]}`, $options: "i" }, 
-            lastName: { $regex: `^${req.query["lastName"]}`, $options: "i" },
-            org_id: req.query.org_id
+//Delete Guest by single entry by ID
+router.delete("/:id", (req, res, next) => { 
+    primarydata.deleteOne({ _id: req.params.id }, (error, data) => {
+        if (error) {
+            return next(error)
+        } else {
+            res.json(data)
         }
-    } else if 
-    (req.query["searchBy"] === 'number') {
-        dbQuery = {
-            "phoneNumbers.primaryPhone": { $regex: `^${req.query["phoneNumbers.primaryPhone"]}`, $options: "i" },
-            org_id: req.query.org_id
-        }
-    } else if
-    (req.query["searchBy"] === 'id') {
-        dbQuery = {
-            _id: req.query.id,
-        }
-    };
-    primarydata.findOneAndDelete(
-        dbQuery,
-        (error, data) => {
-            if (error) {
-                return next(error);
-            } else {
-                res.json(data);
-            }
-        }
-    )
+    })
 });
-
 module.exports = router;
