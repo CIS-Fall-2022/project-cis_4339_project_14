@@ -10,15 +10,3 @@ module.exports = {
   HOST: process.env.HOST || 'localhost',
   PORT: process.env.PORT || 3000
 };
-
-module.exports = {
-  NODE_ENV: process.env.NODE_ENV || 'org2',
-  HOST: process.env.HOST || 'localhost',
-  PORT: process.env.PORT || 3001
-};
-
-module.exports = {
-  NODE_ENV: process.env.NODE_ENV || 'org3',
-  HOST: process.env.HOST || 'localhost',
-  PORT: process.env.PORT || 3002
-};
