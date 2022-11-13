@@ -196,6 +196,14 @@
               class="bg-red-700 text-white rounded"
             >Update Event</button>
           </div>
+            <!--Added event delete button to hard delete event from database-->
+          <div class="flex justify-between mt-10 mr-20">
+            <button
+              @click="handleEventDelete"
+              type="button"
+              class="bg-red-700 text-white rounded"
+            >Delete Event</button>
+          </div>
           <div class="flex justify-between mt-10 mr-20">
             <button
               type="reset"
@@ -309,6 +317,17 @@ export default {
   methods: {
     formattedDate(datetimeDB) {
       return DateTime.fromISO(datetimeDB).plus({ days: 1 }).toLocaleString();
+    },
+    //added event delete function that will delete event data 
+    //and alert the user that event has been removed
+    handleEventDelete() {
+      let apiURL = import.meta.env.VITE_ROOT_API + `/eventdata/id/${this.id}`;
+      axios.delete(apiURL, this.client).then(() => {
+        alert("Event has been Removed.");
+        this.$router.back().catch((error) => {
+          console.log(error);
+        });
+      });
     },
     handleEventUpdate() {
       this.event.services = this.checkedServices;
