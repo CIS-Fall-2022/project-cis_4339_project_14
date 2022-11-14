@@ -15,17 +15,12 @@
             <label class="block">
               <span class="text-gray-700">Event Name</span>
               <span style="color:#ff0000">*</span>
-              <input
-                type="text"
+              <input type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                v-model="event.eventName"
-              />
+                v-model="event.eventName" />
               <span class="text-black" v-if="v$.event.eventName.$error">
-                <p
-                  class="text-red-700"
-                  v-for="error of v$.event.eventName.$errors"
-                  :key="error.$uid"
-                >{{ error.$message }}!</p>
+                <p class="text-red-700" v-for="error of v$.event.eventName.$errors" :key="error.$uid">{{ error.$message
+                }}!</p>
               </span>
             </label>
           </div>
@@ -37,15 +32,10 @@
               <span style="color:#ff0000">*</span>
               <input
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                v-model="event.date"
-                type="date"
-              />
+                v-model="event.date" type="date" />
               <span class="text-black" v-if="v$.event.date.$error">
-                <p
-                  class="text-red-700"
-                  v-for="error of v$.event.date.$errors"
-                  :key="error.$uid"
-                >{{ error.$message }}!</p>
+                <p class="text-red-700" v-for="error of v$.event.date.$errors" :key="error.$uid">{{ error.$message }}!
+                </p>
               </span>
             </label>
           </div>
@@ -58,8 +48,7 @@
               <span class="text-gray-700">Description</span>
               <textarea
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                rows="2"
-              ></textarea>
+                rows="2"></textarea>
             </label>
           </div>
 
@@ -71,53 +60,34 @@
             <label>Services Offered at Event</label>
             <div>
               <label for="familySupport" class="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  id="familySupport"
-                  value="Family Support"
-                  v-model="checkedServices"
+                <input type="checkbox" id="familySupport" value="Family Support" v-model="checkedServices"
                   class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
-                  notchecked
-                />
+                  notchecked />
                 <span class="ml-2">Family Support</span>
               </label>
             </div>
             <div>
               <label for="adultEducation" class="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  id="adultEducation"
-                  value="Adult Education"
-                  v-model="checkedServices"
+                <input type="checkbox" id="adultEducation" value="Adult Education" v-model="checkedServices"
                   class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
-                  notchecked
-                />
+                  notchecked />
                 <span class="ml-2">Adult Education</span>
               </label>
             </div>
             <div>
               <label for="youthServices" class="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  id="youthServices"
-                  value="Youth Services Program"
-                  v-model="checkedServices"
+                <input type="checkbox" id="youthServices" value="Youth Services Program" v-model="checkedServices"
                   class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
-                  notchecked
-                />
+                  notchecked />
                 <span class="ml-2">Youth Services Program</span>
               </label>
             </div>
             <div>
               <label for="childhoodEducation" class="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  id="childhoodEducation"
-                  value="Early Childhood Education"
+                <input type="checkbox" id="childhoodEducation" value="Early Childhood Education"
                   v-model="checkedServices"
                   class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
-                  notchecked
-                />
+                  notchecked />
                 <span class="ml-2">Early Childhood Education</span>
               </label>
             </div>
@@ -131,36 +101,33 @@
           <div class="flex flex-col">
             <label class="block">
               <span class="text-gray-700">Address Line 1</span>
-              <input
-                type="text"
+              <input type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                placeholder
-                v-model="event.address.line1"
-              />
+                placeholder v-model="event.address.line1" />
             </label>
           </div>
           <!-- form field -->
           <div class="flex flex-col">
             <label class="block">
               <span class="text-gray-700">Address Line 2</span>
-              <input
-                type="text"
+              <input type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                placeholder
-                v-model="event.address.line2"
-              />
+                placeholder v-model="event.address.line2" />
             </label>
           </div>
           <!-- form field -->
           <div class="flex flex-col">
             <label class="block">
               <span class="text-gray-700">City</span>
-              <input
-                type="text"
+              <span style="color:#ff0000">*</span>
+              <input type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                placeholder
-                v-model="event.address.city"
-              />
+                placeholder v-model="event.address.city" />
+              <!--Added error handling/validation for city-->
+              <span class="text-black" v-if="v$.event.address.city.$error">
+                <p class="text-red-700" v-for="error of v$.event.address.$errors" :key="error.$uid">{{ error.$message
+                }}!</p>
+              </span>
             </label>
           </div>
           <div></div>
@@ -168,24 +135,24 @@
           <div class="flex flex-col">
             <label class="block">
               <span class="text-gray-700">County</span>
-              <input
-                type="text"
+              <input type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                placeholder
-                v-model="event.address.county"
-              />
+                placeholder v-model="event.address.county" />
             </label>
           </div>
           <!-- form field -->
           <div class="flex flex-col">
             <label class="block">
               <span class="text-gray-700">Zip Code</span>
-              <input
-                type="text"
+              <span style="color:#ff0000">*</span>
+              <input type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                placeholder
-                v-model="event.address.zip"
-              />
+                placeholder v-model="event.address.zip" />
+              <!--Added error handling/validation for zip code-->
+              <span class="text-black" v-if="v$.event.address.zip.$error">
+                <p class="text-red-700" v-for="error of v$.event.address.$errors" :key="error.$uid">{{ error.$message
+                }}!</p>
+              </span>
             </label>
           </div>
         </div>
@@ -199,7 +166,7 @@
 </template>
 <script>
 import useVuelidate from "@vuelidate/core";
-import { required } from "@vuelidate/validators";
+import { required, alpha, numeric } from "@vuelidate/validators";
 import axios from "axios";
 export default {
   setup() {
@@ -263,6 +230,10 @@ export default {
       event: {
         eventName: { required },
         date: { required },
+        address: {
+          city: { required, alpha }, //added error handling for city to be only alpha no numeric.
+          zip: { required, numeric }, //added error handling for zip to be only numeric.
+        },
       },
     };
   },
