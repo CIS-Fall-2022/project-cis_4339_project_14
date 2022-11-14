@@ -98,7 +98,7 @@ export default {
     //added client delete function that will delete client data 
     //and alert the user that client has been removed
     handleClientDelete() {
-      let apiURL = import.meta.env.VITE_ROOT_API + `/primarydata/id/${this.id}`;
+      let apiURL = import.meta.env.VITE_ROOT_API + `/primarydata/${this.id}`;
       axios.delete(apiURL, this.client).then(() => {
         alert("Client has been Removed.");
         this.$router.back().catch((error) => {
