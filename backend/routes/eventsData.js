@@ -21,7 +21,9 @@ router.get("/", (req, res, next) => {
 
 
 //super secret get: configs for our bar chart.
-router.get("/configTotals", (req, res, next) => {
+//sweet jesus thank you https://stackoverflow.com/questions/68452294/mongodb-convert-group-object-to-keyvalue-idcount-object
+//this took me so long to understand what i needed
+router.get("/configKV", (req, res, next) => {
     var checkDate = new Date()
     eventdata.aggregate([
         {
@@ -32,13 +34,12 @@ router.get("/configTotals", (req, res, next) => {
                 }
             }
         },
-        { $group: { _id: "$eventName", total: { $sum: { $size: "$attendees" } } } 
+        { $group: 
+            { _id: null, object: 
+                {$push: {k: "$eventName", v: { $sum: { $size: "$attendees" } }} }}
         },
         {
-            $project: {
-                "total": "$total",
-                _id: 0
-            }
+            $replaceRoot: { newRoot: { $arrayToObject: "$object" } }
         }
     ],
     (error, data) => {
@@ -51,35 +52,6 @@ router.get("/configTotals", (req, res, next) => {
 )
 });
 
-router.get("/configLabels", (req, res, next) => {
-    var checkDate = new Date()
-    eventdata.aggregate([
-        {
-            $match: {
-                date: {
-                    $gt: new Date(checkDate.setMonth(checkDate.getMonth() - 2)),
-                    $lt: new Date()
-                }
-            }
-        },
-        { $group: { _id: "$eventName", total: { $sum: { $size: "$attendees" } } } 
-        },
-        {
-            $project: {
-                "name": "$_id",
-                _id: 0
-            }
-        }
-    ],
-    (error, data) => {
-        if (error) {
-            return next(error);
-        } else {
-            res.json(data);
-        }
-    }
-)
-});
 //GET single entry by ID
 router.get("/id/:id", (req, res, next) => {
     eventdata.find({ _id: req.params.id }, (error, data) => {
