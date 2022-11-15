@@ -1,4 +1,5 @@
 const express = require("express");
+const { default: mongoose } = require("mongoose");
 const router = express.Router();
 
 //importing data model schemas
@@ -17,6 +18,68 @@ router.get("/", (req, res, next) => {
     ).sort({ 'updatedAt': -1 }).limit(10);
 });
 
+
+
+//super secret get: configs for our bar chart.
+router.get("/configTotals", (req, res, next) => {
+    var checkDate = new Date()
+    eventdata.aggregate([
+        {
+            $match: {
+                date: {
+                    $gt: new Date(checkDate.setMonth(checkDate.getMonth() - 2)),
+                    $lt: new Date()
+                }
+            }
+        },
+        { $group: { _id: "$eventName", total: { $sum: { $size: "$attendees" } } } 
+        },
+        {
+            $project: {
+                "total": "$total",
+                _id: 0
+            }
+        }
+    ],
+    (error, data) => {
+        if (error) {
+            return next(error);
+        } else {
+            res.json(data);
+        }
+    }
+)
+});
+
+router.get("/configLabels", (req, res, next) => {
+    var checkDate = new Date()
+    eventdata.aggregate([
+        {
+            $match: {
+                date: {
+                    $gt: new Date(checkDate.setMonth(checkDate.getMonth() - 2)),
+                    $lt: new Date()
+                }
+            }
+        },
+        { $group: { _id: "$eventName", total: { $sum: { $size: "$attendees" } } } 
+        },
+        {
+            $project: {
+                "name": "$_id",
+                _id: 0
+            }
+        }
+    ],
+    (error, data) => {
+        if (error) {
+            return next(error);
+        } else {
+            res.json(data);
+        }
+    }
+)
+});
 //GET single entry by ID
 router.get("/id/:id", (req, res, next) => {
     eventdata.find({ _id: req.params.id }, (error, data) => {
@@ -151,7 +214,7 @@ router.get("/eventAttendees", (req, res, next) => {
                 }
             }
         },
-        { $group: { _id: "$eventName", total: { $sum: { $size: "$attendees" } } } }
+        { $group: { _id: "$eventName", total: { $sum: { $size: "$attendees" } } } },
     ],
         (error, data) => {
             if (error) {
