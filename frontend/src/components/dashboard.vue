@@ -38,16 +38,17 @@
         <h2 class="text-2xl font-bold">Clients by Event</h2>
       </div>
       <div class="flex flex-col col-span-2">
-        <canvas id="eventchart" style="width:100%;max-width:700px"></canvas>
+        <BarChart />
       </div>
     </div>
   </main>
 </template>
 <script>
+import BarChart from './BarChart.vue'
 import axios from "axios";
 
 export default {
-  components: {
+  components: { BarChart
   },
   data() {
     return {
