@@ -32,6 +32,15 @@
         </table>
       </div>
     </div>
+    <!-- Display graph-->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10">
+      <div class="ml-10">
+        <h2 class="text-2xl font-bold">Clients by Event</h2>
+      </div>
+      <div class="flex flex-col col-span-2">
+        <canvas id="eventchart" style="width:100%;max-width:700px"></canvas>
+      </div>
+    </div>
   </main>
 </template>
 <script>
