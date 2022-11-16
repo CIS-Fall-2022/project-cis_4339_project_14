@@ -72,6 +72,7 @@ export default {
       data: {
         labels: _.keys(chartDataArray[0]),
         datasets: [{
+          label: "Client By Events", // added label for chart 
           data: _.values(chartDataArray[0])
         }],   
       },
