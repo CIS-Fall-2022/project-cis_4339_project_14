@@ -11,6 +11,7 @@ cd backend
 Follow instructions in backend README
 
 ## Frontend Vue 3 Application
+# Available live at: https://d26hazawe83qu7.cloudfront.net/ (no custom domain name because my head hurts)
 ```
 cd frontend
 ```
