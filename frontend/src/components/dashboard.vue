@@ -37,28 +37,52 @@
       <div class="ml-10">
         <h2 class="text-2xl font-bold">Clients by Event</h2>
       </div>
-      <div class="flex flex-col col-span-2">
-        <BarChart />
+      <div id="chart" class="flex flex-col col-span-2">
+        <canvas id="myChart"></canvas>
       </div>
     </div>
   </main>
 </template>
 <script>
-import BarChart from './BarChart.vue'
 import axios from "axios";
+import Chart from 'chart.js/auto';
+import _, { map } from 'underscore';
 
 export default {
-  components: { BarChart
+  components: {
   },
   data() {
     return {
       queryData: [],
     };
   },
-  mounted() {
+  async mounted() {
     let apiURL = import.meta.env.VITE_ROOT_API + `/primarydata/`;
     axios.get(apiURL).then((resp) => {
       this.queryData = resp.data;
+    });
+    let apiData = import.meta.env.VITE_ROOT_API + `/eventData/configKV/`;
+    let chartData = await axios.get(apiData)
+    let chartDataArray = chartData.data
+    console.log(chartDataArray)
+    console.log(_.keys(chartDataArray[0]))
+    console.log(_.values(chartDataArray[0]))
+    var chart = new Chart("myChart", {
+      type: "bar",
+      data: {
+        labels: _.keys(chartDataArray[0]),
+        datasets: [{
+          data: _.values(chartDataArray[0])
+        }],   
+      },
+      options: {
+        scales: {
+          y: {
+            max: 10,
+            min: 0
+          }
+        }
+      }
     });
     window.scrollTo(0, 0);
   },
