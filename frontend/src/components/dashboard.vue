@@ -42,31 +42,31 @@
         <canvas id="myChart"></canvas>
       </div>
     </div>
-
+    <!--Code use from class examples-->
     <!-- Start of loading animation -->
     <div class="mt-40" v-if="loading">
-          <p class="
+      <p class="
                   text-6xl
                   font-bold
                   text-center text-gray-500
                   animate-pulse
                 ">
-            Loading...
-          </p>
-        </div>
-        <!-- End of loading animation -->
+        Loading...
+      </p>
+    </div>
+    <!-- End of loading animation -->
 
-     <!-- Start of error alert -->
-     <div class="mt-12 bg-red-50" v-if="error">
-          <h3 class="px-4 py-1 text-4xl font-bold text-white bg-red-800">
-            {{ error.title }}
-          </h3>
-          <p class="p-4 text-lg font-bold text-red-900">
-            {{ error.message }}
-          </p>
-        </div>
-        <!-- End of error alert -->
-        <br />
+    <!-- Start of error alert -->
+    <div class="mt-12 bg-red-50" v-if="error">
+      <h3 class="px-4 py-1 text-4xl font-bold text-white bg-red-800">
+        {{ error.title }}
+      </h3>
+      <p class="p-4 text-lg font-bold text-red-900">
+        {{ error.message }}
+      </p>
+    </div>
+    <!-- End of error alert -->
+    <br />
   </main>
 </template>
 <script>
@@ -84,63 +84,73 @@ export default {
       error: null,
     };
   },
-  async mounted() {
+  async mounted(){
+    try{
     let apiURL = import.meta.env.VITE_ROOT_API + `/primarydata/`;
     axios.get(apiURL).then((resp) => {
       this.queryData = resp.data;
     });
-    let apiData = import.meta.env.VITE_ROOT_API + `/eventdata/configKV/`;
-    let chartData = await axios.get(apiData)
-    let chartDataArray = chartData.data
-    console.log(chartDataArray)
-    console.log(_.keys(chartDataArray[0]))
-    console.log(_.values(chartDataArray[0]))
-    var chart = new Chart("myChart", {
-      type: "bar",
-      data: {
-        labels: _.keys(chartDataArray[0]),
-        datasets: [{
-          label: "Client By Events", // added label for chart 
-          data: _.values(chartDataArray[0])
-        }],
-      },
-      options: {
-        scales: {
-          y: {
-            max: 10,
-            min: 0
+    // Used for error handling demo
+    // methods: {
+    //   routePush(routeName) 
+    //   {
+    //     this.$router.push({ name: routeName });
+    //   }
+    // }
+      let apiData = import.meta.env.VITE_ROOT_API + `/eventdata/configKV/`;
+      let chartData = await axios.get(apiData)
+      let chartDataArray = chartData.data
+      console.log(chartDataArray)
+      console.log(_.keys(chartDataArray[0]))
+      console.log(_.values(chartDataArray[0]))
+      var chart = new Chart("myChart", {
+        type: "bar",
+        data: {
+          labels: _.keys(chartDataArray[0]),
+          datasets: [{
+            label: "Client By Events", // added label for chart 
+            data: _.values(chartDataArray[0])
+          }],
+        },
+        options: {
+          scales: {
+            y: {
+              max: 10,
+              min: 0
+            }
           }
         }
+      });
+      window.scrollTo(0, 0);
+      // Error handling in the application
+  }catch(err) {
+      if (err.response) {
+        // client received an error response (5xx, 4xx)
+        this.error = {
+          title: "Server Response",
+          message: err.message,
+        };
+      } else if (err.request) {
+        // client never received a response, or request never left
+        this.error = {
+          title: "Unable to Reach Server",
+          message: err.message,
+        };
+      } else {
+        // There's probably an error in your code
+        this.error = {
+          title: "Application Error",
+          message: err.message,
+        };
       }
-    });
-    window.scrollTo(0, 0);
-    // Error handling in the application
-  },catch(err) { 
-        if (err.response) {
-          // client received an error response (5xx, 4xx)
-          this.error = {
-            title: "Server Response",
-            message: err.message,
-          };
-        } else if (err.request) {
-          // client never received a response, or request never left
-          this.error = {
-            title: "Unable to Reach Server",
-            message: err.message,
-          };
-        } else {
-          // There's probably an error in your code
-          this.error = {
-            title: "Application Error",
-            message: err.message,
-          };
-        }
-        this.loading = false;
-      },
-methods: {
-  routePush(routeName) {
-    this.$router.push({ name: routeName });
-  },
-}
+      this.loading = false;
+    }
+    methods:{
+      routePush(routeName) 
+      {
+        this.$router.push({ name: routeName });
+      }
+    }
+  }
 };
 </script>
